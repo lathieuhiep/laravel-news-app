@@ -19,6 +19,8 @@ class PermissionsSeeder extends Seeder
             [
                 'name' => 'Create Post',
                 'slug' => 'create_post',
+                'created_at' => now(),
+                'updated_at' => now(),
             ],
             [
                 'name' => 'Edit Post',
@@ -34,7 +36,9 @@ class PermissionsSeeder extends Seeder
             ],
             [
                 'name' => 'Delete Post',
-                'slug' => 'delete_post'
+                'slug' => 'delete_post',
+                'created_at' => now(),
+                'updated_at' => now(),
             ],
             [
                 'name' => 'Restore Post',
