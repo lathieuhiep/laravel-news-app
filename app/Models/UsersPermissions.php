@@ -2,10 +2,13 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 
 class UsersPermissions extends Model
 {
-    use HasFactory;
+    public function userRole(): HasOne
+    {
+        return $this->hasOne(Role::class);
+    }
 }
