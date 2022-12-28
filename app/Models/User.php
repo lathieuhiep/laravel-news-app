@@ -60,4 +60,15 @@ class User extends Authenticatable
 
         return false;
     }
+
+    public function getUserRole()
+    {
+        $role = $this->role()->first();
+
+        if ( !empty( $role ) ) {
+            return $role->name;
+        }
+
+        return '';
+    }
 }

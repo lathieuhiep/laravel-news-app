@@ -1,46 +1,18 @@
-@php
-    $menus = [
-        [
-            'title' => __('Dashboard'),
-            'icon' => 'fas fa-tachometer-alt',
-            'link' => route('admin.dashboard.show')
-        ],
-        [
-            'title' => __('Layouts'),
-            'icon' => '',
-            'link' => '#',
-            'children' => [
-                [
-                   'title' => __('Static Navigation'),
-                   'link' => '#',
-                ],
-                [
-                    'title' => __('Light Sidenav'),
-                    'link' => '#',
-                ]
-            ]
-        ],
-        [
-            'title' => __('Pages'),
-            'link' => '#',
-            'children' => [
-                [
-                   'title' => __('Authentication'),
-                   'link' => '#',
-                ],
-                [
-                   'title' => __('Error'),
-                   'link' => '#',
-                ]
-            ]
-        ],
-    ]
-@endphp
 <div id="layoutSidenav_nav">
     <nav class="sb-sidenav accordion sb-sidenav-dark" id="sidenavAccordion">
         <div class="sb-sidenav-menu">
             <div class="nav">
-                {{ App\Helpers\Common::renderMenusAdmin($menus) }}
+                {{-- Dashboard --}}
+                <a class="nav-link" href="{{ route('admin.dashboard.index') }}">
+                    <div class="sb-nav-link-icon"><i class="fas fa-tachometer-alt"></i></div>
+                    {{ __('Dashboard') }}
+                </a>
+
+                {{-- Users --}}
+                <a class="nav-link" href="{{ route('admin.user.index') }}">
+                    <div class="sb-nav-link-icon"><i class="fa-solid fa-user"></i></div>
+                    {{ __('Users') }}
+                </a>
 
                 <a class="nav-link collapsed" href="#" data-bs-toggle="collapse" data-bs-target="#collapseLayouts" aria-expanded="false" aria-controls="collapseLayouts">
                     <div class="sb-nav-link-icon"><i class="fas fa-columns"></i></div>

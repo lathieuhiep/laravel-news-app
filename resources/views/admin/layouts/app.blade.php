@@ -7,9 +7,11 @@
     <!-- CSRF Token -->
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
+    <!-- fontawesome 6.2.1 -->
+    <link href="{{ asset('assets/libs/fontawesome/css/all.min.css') }}" rel="stylesheet">
+
     <!-- Style CSS + Bootstrap -->
     <link href="{{ asset('admin/assets/css/styles.css') }}" rel="stylesheet">
-    <script src="https://use.fontawesome.com/releases/v6.1.0/js/all.js" crossorigin="anonymous"></script>
 
     <title>@yield('title') - News App</title>
 </head>
