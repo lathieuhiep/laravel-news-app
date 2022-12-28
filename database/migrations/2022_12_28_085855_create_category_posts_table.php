@@ -1,7 +1,7 @@
 <?php
 
-use App\Models\Role;
-use App\Models\User;
+use App\Models\Category;
+use App\Models\Post;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
@@ -15,10 +15,10 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::create('users_roles', function (Blueprint $table) {
+        Schema::create('category_posts', function (Blueprint $table) {
             $table->id();
-            $table->foreignIdFor(User::class, 'user_id')->constrained('users')->onDelete('cascade');
-            $table->foreignIdFor(Role::class, 'role_id')->constrained('roles')->onDelete('cascade');
+            $table->foreignIdFor(Category::class, 'category_id')->constrained('categories')->onDelete('SET DEFAULT');
+            $table->foreignIdFor(Post::class, 'post_id')->constrained('posts')->cascadeOnDelete();
             $table->timestamps();
         });
     }
@@ -30,6 +30,6 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('users_roles');
+        Schema::dropIfExists('category_posts');
     }
 };
