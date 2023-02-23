@@ -1,6 +1,8 @@
 <?php
 
 use App\Http\Controllers\admin\DashboardController;
+use App\Http\Controllers\admin\PostCategoryController;
+use App\Http\Controllers\admin\PostController;
 use App\Http\Controllers\admin\UserController;
 use Illuminate\Support\Facades\Route;
 
@@ -34,6 +36,22 @@ Route::group([
 ], function () {
     // dashboard
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard.index');
+	
+	// post
+	Route::group([
+		'prefix' => 'post',
+		'as' => 'post.',
+	], function () {
+		Route::get('/', [PostController::class, 'index'])->name('index');
+	});
+	
+	// category post
+	Route::group([
+		'prefix' => 'category',
+		'as' => 'category.',
+	], function () {
+		Route::get('/', [PostCategoryController::class, 'index'])->name('index');
+	});
 
     // users
     Route::get('/users', [UserController::class, 'index'])->name('user.index');
