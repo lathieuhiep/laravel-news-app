@@ -16,4 +16,10 @@ class PostController extends Controller
 		
 		return view('admin.posts.list')->with('dataPost', $dataPost);
 	}
+	
+	// create post
+	public function create()
+	{
+		return view('admin.posts.create');
+	}
 }

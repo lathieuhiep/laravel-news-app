@@ -2,33 +2,37 @@
 @section('title', 'Posts')
 
 @section('content')
-    <div class="container-fluid px-4">
-        <h1 class="mt-4">Posts</h1>
+    <div class="top-warp d-flex align-items-center pt-3 pb-3">
+        <h1 class="heading m-0 me-3">
+            {{ __('Posts') }}
+        </h1>
 
-        <div class="table-warp table-users">
-            <table class="table">
-                <thead class="table-light">
+        <a class="btn border" href="{{ route('admin.post.create') }}">{{ __('Add New') }}</a>
+    </div>
+
+    <div class="table-warp table-users">
+        <table class="table">
+            <thead class="table-light">
+            <tr>
+                <th scope="col">Title</th>
+                <th scope="col">Author</th>
+                <th scope="col">Categories</th>
+                <th scope="col">Date</th>
+            </tr>
+            </thead>
+
+            <tbody>
+            @foreach($dataPost as $item)
                 <tr>
-                    <th scope="col">Title</th>
-                    <th scope="col">Author</th>
-                    <th scope="col">Categories</th>
-                    <th scope="col">Date</th>
+                    <td>{{ $item->title }}</td>
+                    <td>{{ $item->author->name }}</td>
+                    <td>{{ $item->getCategoryName() }}</td>
+                    <td>{{ $item->created_at  }}</td>
                 </tr>
-                </thead>
+            @endforeach
+            </tbody>
+        </table>
 
-                <tbody>
-                @foreach($dataPost as $item)
-                    <tr>
-                        <td>{{ $item->title }}</td>
-                        <td>{{ $item->author->name }}</td>
-                        <td>{{ $item->getCategoryName() }}</td>
-                        <td>{{ $item->created_at  }}</td>
-                    </tr>
-                @endforeach
-                </tbody>
-            </table>
-
-            {{ $dataPost->links() }}
-        </div>
+        {{ $dataPost->links() }}
     </div>
 @endsection

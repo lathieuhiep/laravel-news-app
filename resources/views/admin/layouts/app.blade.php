@@ -12,6 +12,7 @@
 
     <!-- Style CSS + Bootstrap -->
     <link href="{{ asset('admin/assets/css/styles.css') }}" rel="stylesheet">
+    <link href="{{ asset('admin/assets/css/custom.css') }}" rel="stylesheet">
 
     <title>@yield('title') - News App</title>
 </head>
@@ -22,9 +23,9 @@
         @include('admin.layouts.sidebar')
 
         <div id="layoutSidenav_content">
-            <main>
+            <div class="container-fluid pt-4 px-4 pb-4">
                 @yield('content')
-            </main>
+            </div>
 
             @include('admin.layouts.footer')
         </div>
