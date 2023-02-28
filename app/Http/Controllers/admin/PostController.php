@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\Category;
 use App\Models\Post;
 use Illuminate\Http\Request;
 
@@ -20,6 +21,8 @@ class PostController extends Controller
 	// create post
 	public function create()
 	{
-		return view('admin.posts.create');
+		$getCategories = Category::all();
+		
+		return view('admin.posts.create')->with('categories', $getCategories);
 	}
 }
