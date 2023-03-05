@@ -74,7 +74,7 @@
                         </div>
 
                         <div class="card-body">
-                            <input class="form-control" id="post-image" type="file" aria-label="" name="media_id">
+                            <input class="form-control" id="post-image" type="file" aria-label="" name="image">
                         </div>
                     </div>
                 </div>

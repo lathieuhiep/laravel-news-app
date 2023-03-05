@@ -4,4 +4,9 @@ return [
 	'ROLE_ADMIN' => 'administrator',
 	'ROLE_EDITOR' => 'editor',
 	'ROLE_USER' => 'User',
+
+    // post status
+    'POST_STATUS' => [
+        'PUBLISH' => 'publish'
+    ]
 ];
