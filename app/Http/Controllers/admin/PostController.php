@@ -7,6 +7,10 @@ use App\Models\Category;
 use App\Models\CategoryPost;
 use App\Models\Post;
 use App\Models\User;
+use App\Repositories\Category\CategoryRepositoryInterface;
+use App\Repositories\Post\PostRepositoryInterface;
+use App\Repositories\User\UserRepository;
+use App\Repositories\User\UserRepositoryInterface;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -16,11 +20,25 @@ use Illuminate\Support\Str;
 
 class PostController extends Controller
 {
+	private $userRepository;
+	private $postRepository;
+	private $categoryRepository;
+	
+	public function __construct(
+		UserRepositoryInterface $userRepository,
+		PostRepositoryInterface $postRepository,
+		CategoryRepositoryInterface $categoryRepository
+	)
+	{
+		$this->userRepository = $userRepository;
+		$this->postRepository = $postRepository;
+		$this->categoryRepository = $categoryRepository;
+	}
 
 	// get post list
 	public function index()
 	{
-		$dataPost = Post::query()->paginate();
+		$dataPost = $this->postRepository->paginate();
 
 		return view('admin.posts.list')->with('dataPost', $dataPost);
 	}
@@ -29,12 +47,12 @@ class PostController extends Controller
 	public function create()
 	{
 		$data = [];
+		
 		// get user list management
-		$users = new User();
-		$data['users'] = $users->getManagementUsers();
+		$data['users'] = $this->userRepository->getManagementUsers();
 
 		// get data categories
-		$data['categories'] = Category::all();
+		$data['categories'] = $this->categoryRepository->all();
 
 		return view('admin.posts.create')->with( $data );
 	}
@@ -46,35 +64,12 @@ class PostController extends Controller
 	 */
 	public function store(Request $request)
 	{
-		DB::beginTransaction();
-
-		try {
-			$post = Post::create([
-                'user_id' => Auth::user()->id,
-                'title' => $request->input('title'),
-                'slug' => Str::of( $request->input('title') )->slug('-'),
-                'content' => $request->input('content'),
-                'excerpt' => $request->input('excerpt'),
-                'status' => Config::get('constants.POST_STATUS.PUBLISH')
-            ]);
-
-            $post->addMediaFromRequest('image')->toMediaCollection();
-
-            $post_id = $post->id;
-            $category_ids = $request->input('post_category');
-
-            foreach ($category_ids as $category_id ) {
-                CategoryPost::create([
-                    'category_id' => $category_id,
-                    'post_id' => $post_id
-                ]);
-            }
-
-			DB::commit();
-		} catch (Exception $e) {
-			DB::rollBack();
-
-			throw new Exception($e->getMessage());
+		$data = $this->postRepository->create($request);
+	
+		if ( empty( $data ) ) {
+			return abort( Config::get('constants.BAD_REQUEST') );
 		}
+		
+		return redirect()->route('admin.post.index');
 	}
 }

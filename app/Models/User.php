@@ -80,18 +80,4 @@ class User extends Authenticatable
 
         return '';
     }
-	
-	// get users has management
-	public function getManagementUsers(): Collection
-	{
-		return User::query()
-			->join('users_roles', 'users.id', '=', 'users_roles.user_id')
-			->join('roles', 'users_roles.role_id', '=', 'roles.id')
-			->whereIn('roles.slug', [
-				Config::get('constants.ROLE_ADMIN'),
-				Config::get('constants.ROLE_EDITOR')
-			])
-			->select('users.id', 'users.name')
-			->get();
-	}
 }

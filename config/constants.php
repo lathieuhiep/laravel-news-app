@@ -8,5 +8,8 @@ return [
     // post status
     'POST_STATUS' => [
         'PUBLISH' => 'publish'
-    ]
+    ],
+	
+	// Status request
+	'BAD_REQUEST' => 400
 ];
