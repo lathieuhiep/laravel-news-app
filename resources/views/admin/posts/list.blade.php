@@ -18,16 +18,26 @@
                 <th scope="col">Author</th>
                 <th scope="col">Categories</th>
                 <th scope="col">Date</th>
+                <th scope="col">Edit</th>
             </tr>
             </thead>
 
             <tbody>
             @foreach($dataPost as $item)
                 <tr>
-                    <td>{{ $item->title }}</td>
+                    <td>
+                        <a class="text-decoration-none" href="{{ route('admin.post.edit', $item->id) }}">
+                            {{ $item->title }}
+                        </a>
+                    </td>
                     <td>{{ $item->author->name }}</td>
                     <td>{{ $item->getCategoryName() }}</td>
-                    <td>{{ $item->created_at  }}</td>
+                    <td>{{ $item->created_at }}</td>
+                    <td>
+                        <a href="{{ route('admin.post.edit', $item->id) }}">
+                            <i class="fas fa-edit"></i>
+                        </a>
+                    </td>
                 </tr>
             @endforeach
             </tbody>

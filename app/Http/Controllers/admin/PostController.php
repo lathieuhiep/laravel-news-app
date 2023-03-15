@@ -42,8 +42,11 @@ class PostController extends Controller
 
 		return view('admin.posts.list')->with('dataPost', $dataPost);
 	}
-
-	// create post
+	
+	/**
+	 * create post
+	 * @throws Exception
+	 */
 	public function create()
 	{
 		$data = [];
@@ -57,19 +60,47 @@ class PostController extends Controller
 		return view('admin.posts.create')->with( $data );
 	}
 
-	// store a new post
-
 	/**
+	 * store a new post
 	 * @throws Exception
 	 */
 	public function store(Request $request)
 	{
-		$data = $this->postRepository->create($request);
+		$response = $this->postRepository->createPost($request);
 	
-		if ( empty( $data ) ) {
-			return abort( Config::get('constants.BAD_REQUEST') );
+		if ( !$response ) {
+			abort( Config::get('constants.BAD_REQUEST') );
 		}
 		
 		return redirect()->route('admin.post.index');
+	}
+	
+	/**
+	 * edit post
+	 * @throws Exception
+	 */
+	public function edit($id)
+	{
+		// get data post
+		$data['post'] = $this->postRepository->find($id);
+		
+		// get all category id
+		$data['categoryIds'] = $data['post']->categories()->pluck('categories.id')->toArray();
+		
+		// get data categories
+		$data['categories'] = $this->categoryRepository->all();
+		
+		return view('admin.posts.edit')->with($data);
+	}
+	
+	public function update(Request $request, $id)
+	{
+		$response = $this->postRepository->updatePost($request, $id);
+		
+		if ( !$response ) {
+			abort( Config::get('constants.BAD_REQUEST') );
+		}
+		
+		return redirect()->route('admin.post.edit', $id);
 	}
 }

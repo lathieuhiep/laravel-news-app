@@ -200,7 +200,11 @@ return [
 		* Application Service Providers Repositories
 		*/
 	    App\Providers\RepositoryServiceProvider::class,
-
+	
+	    /*
+	   * Application Service Providers DebugBar
+	   */
+	    'Barryvdh\Debugbar\ServiceProvider',
     ],
 
     /*
@@ -216,7 +220,8 @@ return [
 
     'aliases' => Facade::defaultAliases()->merge([
         // 'ExampleClass' => App\Example\ExampleClass::class,
-        'Common' => App\Helpers\Common::class
+        'Common' => App\Helpers\Common::class,
+	    'Debugbar' => 'Barryvdh\Debugbar\Facade'
     ])->toArray(),
 
 ];

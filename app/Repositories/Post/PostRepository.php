@@ -17,7 +17,17 @@ class PostRepository extends BaseRepository implements PostRepositoryInterface {
 		parent::__construct($model);
 	}
 	
-	public function create($request)
+	// create category post
+	public function createCategoryPost ($categoryId, $postId)
+	{
+		CategoryPost::create([
+			'category_id' => $categoryId,
+			'post_id' => $postId
+		]);
+	}
+	
+	// store a new post
+	public function createPost($request): bool|string
 	{
 		DB::beginTransaction();
 		
@@ -31,19 +41,64 @@ class PostRepository extends BaseRepository implements PostRepositoryInterface {
 				'status' => Config::get('constants.POST_STATUS.PUBLISH')
 			]);
 			
-			$post->addMediaFromRequest('image')->toMediaCollection();
-			
-			//
-			$post_id = $post->id;
-			$category_ids = $request->input('post_category');
-			
-			foreach ($category_ids as $category_id ) {
-				$this->categoryRepository->create([
-					'category_id' => $category_id,
-					'post_id' => $post_id
-				]);
+			if ( $request->hasFile('image') ) {
+				$post->addMediaFromRequest('image')->toMediaCollection();
 			}
 			
+			// create category of post
+			$post_id = $post->id;
+			$category_ids = $request->input('post_category');
+	
+			if ( empty( $category_ids ) ) {
+				$category_ids = [Config::get('constants.CATEGORY_DEFAULT')];
+			}
+			
+			foreach ($category_ids as $category_id ) {
+				$this->createCategoryPost($category_id, $post_id);
+			}
+			
+			DB::commit();
+			
+			return true;
+		} catch (\Exception $e) {
+			DB::rollBack();
+			
+			return $e->getMessage();
+		}
+	}
+	
+	// update post
+	public function updatePost($request, $id): bool|string
+	{
+		DB::beginTransaction();
+		
+		try {
+			// update post
+			$post= $this->model->find($id);
+			$post->update( $request->all() );
+			
+			if ( $request->hasFile('image') ) {
+				$post->deletePreservingMedia();
+				$post->addMediaFromRequest('image')->toMediaCollection();
+			}
+			
+			// update category post
+			$category_ids = $request->input('post_category');
+			
+			if ( empty( $category_ids ) ) {
+				$category_ids = [Config::get('constants.CATEGORY_DEFAULT')];
+			}
+			
+			foreach ($category_ids as $category_id ) {
+				$category_post = CategoryPost::query()->where([
+					['category_id', $category_id],
+					['post_id', $id]
+				])->first();
+				
+				if ( $category_post->isEmpty() ) {
+					$this->createCategoryPost($category_id, $id);
+				}
+			}
 			
 			DB::commit();
 			
