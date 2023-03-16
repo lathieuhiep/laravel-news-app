@@ -18,35 +18,33 @@ class PostRepository extends BaseRepository implements PostRepositoryInterface {
 	{
 		parent::__construct($model);
 	}
-	
+
 	// create category post
 	public function createCategoryPost ($categoryId, $postId): bool
 	{
 		DB::beginTransaction();
-		
+
 		try {
 			CategoryPost::create([
 				'category_id' => $categoryId,
 				'post_id' => $postId
 			]);
-			
 			DB::commit();
-			
+
 			return true;
 		} catch (Exception $e) {
 			DB::rollBack();
-			
 			Log::error($e);
-			
+
 			return false;
 		}
 	}
-	
+
 	// store a new post
-	public function createPost($request): bool|string
+	public function createPost($request): bool
 	{
 		DB::beginTransaction();
-		
+
 		try {
 			$post = $this->model->create([
 				'user_id' => Auth::user()->id,
@@ -56,78 +54,78 @@ class PostRepository extends BaseRepository implements PostRepositoryInterface {
 				'excerpt' => $request->input('excerpt'),
 				'status' => Config::get('constants.POST_STATUS.PUBLISH')
 			]);
-			
+
 			if ( $request->hasFile('image') ) {
 				$post->addMediaFromRequest('image')->toMediaCollection();
 			}
-			
+
 			// create category of post
 			$post_id = $post->id;
 			$category_ids = $request->input('post_category');
-	
+
 			if ( empty( $category_ids ) ) {
 				$category_ids = [Config::get('constants.CATEGORY_DEFAULT')];
 			}
-			
+
 			foreach ($category_ids as $category_id ) {
 				$this->createCategoryPost($category_id, $post_id);
 			}
-			
+
 			DB::commit();
-			
+
 			return true;
 		} catch (Exception $e) {
-			DB::rollBack();
-			
-			return $e->getMessage();
+            DB::rollBack();
+            Log::error($e);
+
+			return false;
 		}
 	}
-	
+
 	// update post
 	public function updatePost($request, $id): bool
 	{
 		DB::beginTransaction();
-		
+
 		try {
 			// update post
 			$post= $this->model->find($id);
 			$post->update( $request->all() );
-			
+
 			if ( $request->hasFile('image') ) {
-				$post->deletePreservingMedia();
-				$post->addMediaFromRequest('image')->toMediaCollection('image');
+				$post->clearMediaCollection();
+				$post->addMediaFromRequest('image')->toMediaCollection();
 			}
-			
+
 			// update category post
 			$category_ids = $request->input('post_category');
-			
+
 			if ( empty( $category_ids ) ) {
 				$category_ids = [Config::get('constants.CATEGORY_DEFAULT')];
 			}
-			
+
 			foreach ($category_ids as $category_id ) {
 				$checkHasCategory = CategoryPost::query()->where([
 					['category_id', $category_id],
 					['post_id', $id]
 				])->first();
-				
+
 				if ( !$checkHasCategory ) {
 					$this->createCategoryPost($category_id, $id);
 				}
 			}
-			
+
 			DB::commit();
-			
+
 			return true;
 		} catch (Exception $e) {
 			DB::rollBack();
-			
 			Log::error($e);
-			
+
 			return false;
 		}
 	}
-	
+
 	public function getByUser(User $user): Builder
 	{
 		return $this->model->where('user_id', $user->id);
