@@ -3,20 +3,12 @@
 namespace App\Http\Controllers\admin;
 
 use App\Http\Controllers\Controller;
-use App\Models\Category;
-use App\Models\CategoryPost;
-use App\Models\Post;
-use App\Models\User;
 use App\Repositories\Category\CategoryRepositoryInterface;
 use App\Repositories\Post\PostRepositoryInterface;
-use App\Repositories\User\UserRepository;
 use App\Repositories\User\UserRepositoryInterface;
 use Exception;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Config;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Str;
 
 class PostController extends Controller
 {
@@ -38,7 +30,7 @@ class PostController extends Controller
 	// get post list
 	public function index()
 	{
-		$dataPost = $this->postRepository->paginate();
+		$dataPost = $this->postRepository->with(['author', 'categories'])->paginate();
 
 		return view('admin.posts.list')->with('dataPost', $dataPost);
 	}
@@ -83,6 +75,10 @@ class PostController extends Controller
 	{
 		// get data post
 		$data['post'] = $this->postRepository->find($id);
+	
+		if ( !$data['post'] ) {
+			abort( Config::get('constants.BAD_REQUEST') );
+		}
 		
 		// get all category id
 		$data['categoryIds'] = $data['post']->categories()->pluck('categories.id')->toArray();

@@ -17,5 +17,5 @@ return [
 	
 	
 	// Status request
-	'BAD_REQUEST' => 400
+	'BAD_REQUEST' => 404
 ];

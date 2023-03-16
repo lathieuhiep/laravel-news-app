@@ -1,5 +1,6 @@
 <?php
 namespace App\Repositories;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
 
@@ -15,6 +16,11 @@ class BaseRepository implements BaseRepositoryInterfaces
 	public function __construct(Model $model)
 	{
 		$this->model = $model;
+	}
+	
+	public function with($properties): Builder
+	{
+		return $this->model->with($properties);
 	}
 	
 	public function all(): Collection

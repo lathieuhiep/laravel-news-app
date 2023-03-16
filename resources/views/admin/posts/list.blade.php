@@ -31,7 +31,7 @@
                         </a>
                     </td>
                     <td>{{ $item->author->name }}</td>
-                    <td>{{ $item->getCategoryName() }}</td>
+                    <td>{{ $item->categories }}</td>
                     <td>{{ $item->created_at }}</td>
                     <td>
                         <a href="{{ route('admin.post.edit', $item->id) }}">

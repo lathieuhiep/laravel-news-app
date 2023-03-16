@@ -5,11 +5,13 @@ use App\Models\CategoryPost;
 use App\Models\Post;
 use App\Models\User;
 use App\Repositories\BaseRepository;
+use Exception;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
+use Log;
 
 class PostRepository extends BaseRepository implements PostRepositoryInterface {
 	public function __construct(Post $model)
@@ -18,12 +20,26 @@ class PostRepository extends BaseRepository implements PostRepositoryInterface {
 	}
 	
 	// create category post
-	public function createCategoryPost ($categoryId, $postId)
+	public function createCategoryPost ($categoryId, $postId): bool
 	{
-		CategoryPost::create([
-			'category_id' => $categoryId,
-			'post_id' => $postId
-		]);
+		DB::beginTransaction();
+		
+		try {
+			CategoryPost::create([
+				'category_id' => $categoryId,
+				'post_id' => $postId
+			]);
+			
+			DB::commit();
+			
+			return true;
+		} catch (Exception $e) {
+			DB::rollBack();
+			
+			Log::error($e);
+			
+			return false;
+		}
 	}
 	
 	// store a new post
@@ -60,7 +76,7 @@ class PostRepository extends BaseRepository implements PostRepositoryInterface {
 			DB::commit();
 			
 			return true;
-		} catch (\Exception $e) {
+		} catch (Exception $e) {
 			DB::rollBack();
 			
 			return $e->getMessage();
@@ -68,7 +84,7 @@ class PostRepository extends BaseRepository implements PostRepositoryInterface {
 	}
 	
 	// update post
-	public function updatePost($request, $id): bool|string
+	public function updatePost($request, $id): bool
 	{
 		DB::beginTransaction();
 		
@@ -79,7 +95,7 @@ class PostRepository extends BaseRepository implements PostRepositoryInterface {
 			
 			if ( $request->hasFile('image') ) {
 				$post->deletePreservingMedia();
-				$post->addMediaFromRequest('image')->toMediaCollection();
+				$post->addMediaFromRequest('image')->toMediaCollection('image');
 			}
 			
 			// update category post
@@ -90,23 +106,25 @@ class PostRepository extends BaseRepository implements PostRepositoryInterface {
 			}
 			
 			foreach ($category_ids as $category_id ) {
-				$category_post = CategoryPost::query()->where([
+				$checkHasCategory = CategoryPost::query()->where([
 					['category_id', $category_id],
 					['post_id', $id]
 				])->first();
 				
-				if ( $category_post->isEmpty() ) {
+				if ( !$checkHasCategory ) {
 					$this->createCategoryPost($category_id, $id);
 				}
 			}
 			
 			DB::commit();
 			
-			return $post;
-		} catch (\Exception $e) {
+			return true;
+		} catch (Exception $e) {
 			DB::rollBack();
 			
-			return $e->getMessage();
+			Log::error($e);
+			
+			return false;
 		}
 	}
 	

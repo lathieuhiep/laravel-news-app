@@ -7,6 +7,7 @@ namespace App\Repositories;
  * */
 interface BaseRepositoryInterfaces
 {
+	public function with($properties);
 	public function all();
 	public function find($id);
 	public function paginate($perPage);
